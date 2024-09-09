@@ -1,7 +1,8 @@
 import cv2
 import numpy as np
-from cvzone.HandTrackingModule import HandDetector
 import os
+from cvzone.HandTrackingModule import HandDetector
+
 
 capture = cv2.VideoCapture(0)  
 detector = HandDetector(maxHands=1)  
@@ -10,6 +11,7 @@ dir = "dataset"            #aafu la bhako folder ko name lakna tara aautai folde
 letter='ka'                # change garna ka bata kha ma aafai la aani code lai phari run garna 
 count=0 
 location=os.path.join(dir,letter)
+
 if not os.path.exists(location):
     os.makedirs(location)  
 
