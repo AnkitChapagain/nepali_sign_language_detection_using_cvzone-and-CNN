@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NSL Detection - Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
+</head>
+
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+    {% include 'header.html' %}
+    {% include 'header_image.html' %}
+
+    
+    <main class="container mx-auto px-6 py-8 flex-grow">
+        <div class="space-y-8">
+            <!-- 1 -->
+            <a href="{{ url_for('symbols') }}" class="block">
+                <div class="flex items-center gap-6 bg-transparent backdrop-blur-sm p-6 rounded-lg shadow-md hover:bg-gray-200 transition">
+                    <div class="flex-1">
+                        <h3 class="text-xl font-semibold mb-2 text-gray-800">Display Symbols</h3>
+                        <p class="text-lg text-gray-700">All NSL symbols</p>
+                    </div>
+                    <img src="{{ url_for('static', filename='app/symbol.png') }}" alt="Symbol" class="w-48 h-48 object-cover rounded-full">
+                </div>
+            </a>
+
+            <!-- 2 -->
+            <a href="{{ url_for('upload') }}" class="block">
+                <div class="flex flex-row-reverse items-center gap-6 bg-transparent backdrop-blur-sm p-6 rounded-lg shadow-md hover:bg-gray-200 transition">
+                    <div class="flex-1 text-right">
+                        <h3 class="text-xl font-semibold mb-2 text-gray-800">Upload Image for Prediction</h3>
+                        <p class="text-lg text-gray-700">Upload an image to predict the NSL letter.</p>
+                    </div>
+                    <img src="{{ url_for('static', filename='app/upload.png') }}" alt="Symbol" class="w-48 h-48 object-cover rounded-full">
+                </div>
+            </a>
+
+            <!-- 3 -->
+            <a href="{{ url_for('live_detection') }}" class="block">
+                <div class="flex items-center gap-6 bg-transparent backdrop-blur-sm p-6 rounded-lg shadow-md hover:bg-gray-200 transition">
+                    <div class="flex-1">
+                        <h3 class="text-xl font-semibold mb-2 text-gray-800">Live Detection</h3>
+                        <p class="text-lg text-gray-700">Use your webcam for real-time NSL letter detection.</p>
+                    </div>
+                    <img src="{{ url_for('static', filename='app/live.png') }}" alt="Symbol" class="w-48 h-48 object-cover rounded-full">
+                </div>
+            </a>
+        </div>
+    </main>
+
+    <!-- Contact -->
+        
+        <div class="relative z-10 bg-gray-200 bg-opacity-80 p-6">
+            {% include 'contact.html' %}
+        </div>
+</body>
+<footer>
+    {% include 'footer.html' %}
+</footer>
+</html>

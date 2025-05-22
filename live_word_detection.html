@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Word Detection</title>
+    <script src="https://cdn.socket.io/4.5.1/socket.io.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+   
+
+<body class="bg-gradient-to-r from-blue-100 to-purple-100 min-h-screen flex flex-col">
+    {% include 'header.html' %}
+    <h1 class="text-2xl font-bold  text-blue-600 mb-5 text-center">Live Detection</h1>
+<label class="flex justify-center  cursor-pointer">
+    
+    <span id="character-label" class="text-gray-600 font-medium px-4 py-2 bg-gray-300 rounded-l">Character</span>
+    <input type="checkbox" id="toggle-switch" class="hidden">
+    <span id="word-label" class="text-white font-medium px-4 py-2 bg-purple-600 rounded-r">Word</span>
+</label>
+<div class="flex justify-center">
+   
+    <div class="text-center w-full max-w-3xl">
+       
+        <div class="flex justify-self-end items-center mb-5">
+            
+           
+        </div>
+        <!-- Video suru bho -->
+        <div class="border-4 border-blue-300 rounded-lg shadow-lg p-4 mb-5 relative flex ">
+            <video id="videoElement" autoplay playsinline class="rounded shadow-lg mx-auto"></video>
+            <p id="status-text" class="absolute top-2 left-2 bg-yellow-200 text-yellow-800 px-4 py-1 rounded-lg font-semibold">Show Symbol...</p>
+        </div>
+        
+        <!-- output  -->
+        <p class="text-xl font-semibold text-purple-700 mb-5">
+            Predicted Word: <span id="predicted-word" class="font-bold">...</span>
+        </p>
+
+        <!-- tyo rato ra haryo button -->
+        <div class="flex justify-center gap-4">
+            <button id="stop-capture" class="bg-red-500 text-white px-6 py-3 rounded-lg font-medium">stop</button>
+            <button id="confirm-word" class="bg-green-500 text-white px-6 py-3 rounded-lg font-medium">finish</button>
+        </div>
+    </div>
+</div>
+</body>
+
+<script>
+//javascript ta ho 
+const video = document.getElementById('videoElement');
+const predictedWord = document.getElementById('predicted-word');
+const statusText = document.getElementById('status-text');
+const stopButton = document.getElementById('stop-capture');
+const confirmButton = document.getElementById('confirm-word');
+const toggleSwitch = document.getElementById('toggle-switch');
+const characterLabel = document.getElementById('character-label');
+const wordLabel = document.getElementById('word-label');
+
+const socket = io.connect('http://localhost:5000');
+
+let word = "";
+let captureTimer;
+let isCapturing = false;
+let isSoundPlaying = false;
+
+// cmaera acess garna 
+navigator.mediaDevices.getUserMedia({ video: true })
+    .then(stream => {
+        video.srcObject = stream;
+    })
+    .catch(err => {
+        console.error("Error accessing webcam: ", err);
+    });
+
+function captureFrame() {
+    if (isSoundPlaying) return;
+    statusText.innerText = "Wait...";
+    setTimeout(() => {
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        canvas.toBlob(blob => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                socket.emit('capture_image', reader.result);
+            };
+            reader.readAsArrayBuffer(blob);
+        }, 'image/jpeg');
+        statusText.innerText = "Show Symbol...";
+    }, 1000);
+}
+
+function startCapturing() {
+    isCapturing = true;
+    captureTimer = setInterval(captureFrame, 4000);
+    statusText.innerText = "Show Symbol...";
+}
+
+function stopCapturing() {
+    clearInterval(captureTimer);
+    isCapturing = false;
+    statusText.innerText = "Capture Stopped";
+}
+
+stopButton.addEventListener('click', () => {
+    if (isCapturing) {
+        stopCapturing();
+        stopButton.innerText = "Start";
+    } else {
+        startCapturing();
+        stopButton.innerText = "Stop";
+    }
+});
+
+confirmButton.addEventListener('click', () => {
+    if (isSoundPlaying) return;
+
+    socket.emit('generate_sound', word);
+    isSoundPlaying = true;
+    statusText.innerText = "Generating Sound...";
+
+    socket.on('sound_generated', data => {
+        if (data.audioPath) {
+            const audio = new Audio(data.audioPath);
+            audio.play();
+            audio.onended = () => {
+                word = "";
+                predictedWord.innerText = word;
+                statusText.innerText = "Ready for new input...";
+            };
+        }
+    });
+});
+
+socket.on('image_prediction', data => {
+    if (data.character) {
+        word += data.character;
+        predictedWord.innerText = word;
+    }
+});
+
+toggleSwitch.addEventListener('change', () => {
+    if (toggleSwitch.checked) {
+        wordLabel.classList.replace('bg-purple-600', 'bg-gray-300');
+        wordLabel.classList.replace('text-white', 'text-gray-600');
+        characterLabel.classList.replace('bg-gray-300', 'bg-purple-600');
+        characterLabel.classList.replace('text-gray-600', 'text-white');
+        window.location.href = 'live_detection'
+       
+    } else {
+
+        characterLabel.classList.replace('bg-purple-600', 'bg-gray-300');
+        characterLabel.classList.replace('text-white', 'text-gray-600');
+        wordLabel.classList.replace('bg-gray-300', 'bg-purple-600');
+        wordLabel.classList.replace('text-gray-600', 'text-white');
+        
+    }
+});
+
+// aafai photo lina lai 
+startCapturing();
+
+</script>
+
+</body>
+</html>

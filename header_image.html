@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <title>Document</title>
+</head>
+<body>
+    <section class="relative h-screen">
+        <!--background ko image -->
+        <div class="absolute inset-0">
+            <img src="static/app/back.webp" alt="Nepali Sign Language" class="w-full h-full object-cover blur-md">
+        </div>
+        <!--main text ra logo -->
+        <div class="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center text-center px-4">
+            <div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
+                <!-- image ko part -->
+                <div class="w-32 h-32">
+                    <img src="static/app/main.jpg" alt="Sign Language Icon" class="rounded-full shadow-lg">
+                </div>
+                <!-- text ko part -->
+                <div>
+                    <h1 class="text-5xl font-bold text-white mb-4">Nepali Sign Language</h1>
+                    <p class="text-xl text-gray-300">Real-Time Translation for Inclusive Communication</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

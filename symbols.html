@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NSL Detection - Symbols</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+       /* css ko patyo  */
+        .symbol-container img {
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+        }
+
+        .symbol-container:hover img {
+            transform: scale(1.15); 
+            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3); 
+            opacity: 0.85; }
+
+       
+        .symbol-container {
+            background-color: rgba(255, 255, 255, 0.5); 
+            transition: border 0.3s ease, background-color 0.3s ease;
+            border: 4px solid transparent;
+        }
+
+        .symbol-container:hover {
+            border-color: rgba(59, 130, 246, 0.5); 
+            background-color: rgba(59, 130, 246, 0.1); 
+        }
+    </style>
+</head>
+
+<body class="bg-gradient-to-r from-blue-100 to-purple-100 min-h-screen p-5">
+    {% include 'header.html' %}
+
+    <main class="container mx-auto">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold text-blue-800">Nepali Sign Language Symbols</h2>
+            <p class="mt-2 text-lg text-blue-600">Hover over the symbols to explore!</p>
+        </div>
+
+        
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-8">
+          <!-- flask ko use gara ko baya ra yo % ko use gara ra code laka ko ho  -->
+           
+            {% for filename, character in symbols %}
+            <div class="symbol-container flex flex-col items-center shadow-md rounded-lg p-4">
+                <img 
+                    src="{{ url_for('static', filename='symbols/' + filename) }}" 
+                    alt="{{ character }}" 
+                    class="w-28 h-28 object-contain rounded-lg">
+                <p class="text-center font-semibold text-gray-700 mt-3">{{ character }}</p>
+            </div>
+        {% endfor %}
+            
+            
+        </div>
+    </main>
+
+   
+    {%include 'footer.html' %}
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NSL Live Detection</title>
+    <script src="https://cdn.socket.io/4.5.1/socket.io.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gradient-to-r from-blue-100 to-purple-100  min-h-screen flex flex-col">
+    {% include 'header.html' %}
+    <div class="text-center">
+        <h1 class="text-2xl font-bold text-blue-600 mb-5">Live Detection</h1>
+        <!-- video -->
+        <div class="flex justify-center items-center mb-5">
+            <label class="flex items-center cursor-pointer">
+                <span id="character-label" class="text-white font-medium px-4 py-2 bg-purple-600 rounded-l">Character</span>
+                <input type="checkbox" id="toggle-switch" class="hidden">
+                <span id="word-label" class="text-gray-600 font-medium px-4 py-2 bg-gray-300 rounded-r">Word</span>
+            </label>
+        </div>
+        <div class="flex justify-center">
+            <video id="videoElement" autoplay playsinline 
+                   class="border-4 border-blue-300 rounded shadow-lg"></video>
+        </div>
+        <p id="prediction-output" class="text-xl font-semibold text-purple-700 mt-4">Waiting for Prediction...</p>
+    </div>
+    {% include 'footer.html' %}
+    <script>
+        const video = document.getElementById('videoElement');
+        const predictionOutput = document.getElementById('prediction-output');
+        const toggleSwitch = document.getElementById('toggle-switch');
+        const characterLabel = document.getElementById('character-label');
+        const wordLabel = document.getElementById('word-label');
+
+        const socket = io.connect('http://localhost:5000');
+
+        // Access cam 
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+            })
+            .catch(err => {
+                console.error("Error accessing webcam: ", err);
+            });
+
+        // regular intervals ma photo lidai server ma patau cha 
+        const captureFrame = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            
+            canvas.toBlob(blob => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    socket.emit('video_frame', reader.result);
+                };
+                reader.readAsArrayBuffer(blob);
+            }, 'image/jpeg');
+        };
+
+        // 500 ms ma aauta photo click huncha 
+        setInterval(captureFrame, 500);
+
+        // output receive huncha ra screen ma halna 
+        socket.on('prediction', data => {
+            console.log("Prediction:", data.character);
+            predictionOutput.innerText = data.character || "Waiting for Prediction...";
+        });
+
+        toggleSwitch.addEventListener('change', () => {
+    if (toggleSwitch.checked) {
+        characterLabel.classList.replace('bg-purple-600', 'bg-gray-300');
+        characterLabel.classList.replace('text-white', 'text-gray-600');
+        wordLabel.classList.replace('bg-gray-300', 'bg-purple-600');
+        wordLabel.classList.replace('text-gray-600', 'text-white');
+        window.location.href = 'live_word_detection.html'
+       
+    } else {
+        wordLabel.classList.replace('bg-purple-600', 'bg-gray-300');
+        wordLabel.classList.replace('text-white', 'text-gray-600');
+        characterLabel.classList.replace('bg-gray-300', 'bg-purple-600');
+        characterLabel.classList.replace('text-gray-600', 'text-white');
+        
+    }
+});
+
+    </script>
+</body>
+</html>
